@@ -1,0 +1,52 @@
+"""
+JS скрипты
+"""
+type Script @entity(plural: "scripts",
+indexes: [
+  [{name: asc}, {unique: true} ]
+]){
+  _id: ID!
+  name: String! @required
+  content: String
+  description: String
+  templates(sort: String, limit: Int, start: Int, where: JSON): [Template!] @virtual
+}
+
+input ScriptInput {
+  name: String!
+  content: String
+  description: String
+  templates: [ID]
+}
+
+input editScriptInput {
+  name: String
+  content: String
+  description: String
+  templates: [ID]
+}
+
+extend type Query {
+  script(id: ID!): Script
+  scripts(sort: String, limit: Int, start: Int, where: JSON): [Script!]
+}
+
+extend type Mutation {
+  createScript(input: createScriptInput): ScriptPayload
+  updateScript(input: updateScriptInput): ScriptPayload
+}
+
+input createScriptInput {
+  data: ScriptInput
+}
+
+input updateScriptInput {
+  where: InputID
+  data: editScriptInput
+}
+
+type ScriptPayload {
+  script: Script
+  error: String
+}
+

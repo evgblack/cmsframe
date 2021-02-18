@@ -1,0 +1,71 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+# The `DateTime` scalar represents a date and time following the ISO 8601 standard
+scalar DateTime
+
+scalar JSON
+
+# The `Long` scalar type represents 52-bit integers
+scalar Long
+
+# The `Upload` scalar type represents a file upload.
+scalar Upload
+
+directive @unique on FIELD_DEFINITION
+
+directive @union(discriminatorField: String, additionalFields: [AdditionalEntityFields]) on UNION
+
+directive @abstractEntity(discriminatorField: String!, additionalFields: [AdditionalEntityFields]) on INTERFACE
+
+directive @entity(embedded: Boolean, additionalFields: [AdditionalEntityFields], plural: String) on OBJECT
+
+directive @column(overrideType: String) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @link(overrideType: String) on FIELD_DEFINITION
+
+directive @embedded on FIELD_DEFINITION
+
+directive @map(path: String!) on FIELD_DEFINITION
+
+directive @isAuth on FIELD_DEFINITION
+directive @isAuthUser on FIELD_DEFINITION
+
+type Query {
+  posts: [Post]
+  entity(name: String!): Entity
+  entities: [Entity]
+  author(id: ID!): Author
+  #getUser: User @isAuth
+}
+
+type Mutation {
+  updateScheme: Int
+}
+
+input AdditionalEntityFields {
+  path: String
+  type: String
+}
+
+type FieldOptions {
+  name: String
+  type: String
+  link: String
+  required: Boolean,
+  column: Boolean,
+  unique: Boolean
+  list: Boolean
+}
+
+type Entity {
+  name: String
+  description: String
+  plural: String
+  singular: String
+  fields: [FieldOptions]
+}

@@ -1,0 +1,56 @@
+"""
+Роли пользователей
+"""
+type Role @entity(plural: "roles",
+indexes: [
+  [{name: asc}, {unique: true} ]
+]){
+  _id: ID!
+  name: String! @required
+  description: String
+  type: String
+  permissions(sort: String, limit: Int, start: Int, where: JSON): [Permission!]
+  countUsers: Int @computed(from: users, alg: size)
+  users(sort: String, limit: Int, start: Int, where: JSON): [User!]
+}
+
+input RoleInput {
+  name: String!
+  description: String
+  type: String
+  permissions: [ID]
+  users: [ID]
+}
+
+input editRoleInput {
+  name: String
+  description: String
+  type: String
+  permissions: [ID]
+  users: [ID]
+}
+
+extend type Query {
+  role(id: ID!): Role
+  roles(sort: String, limit: Int, start: Int, where: JSON): [Role!]
+}
+
+extend type Mutation {
+  createRole(input: createRoleInput): RolePayload
+  updateRole(input: updateRoleInput): RolePayload
+}
+
+input createRoleInput {
+  data: RoleInput
+}
+
+input updateRoleInput {
+  where: InputID
+  data: editRoleInput
+}
+
+type RolePayload {
+  role: Role
+  error: String
+}
+

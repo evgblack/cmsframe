@@ -1,0 +1,72 @@
+"""
+Пользователи
+"""
+type User @entity(plural: "users",
+indexes: [
+  [{username: asc}, {unique: true} ]
+  [{email: asc} ]
+]){
+  _id: ID!
+  username: String! @required
+  email: EmailAddress! @required
+  provider: String
+  confirmed: Boolean
+  blocked: Boolean
+  roles: [Role!]
+  avatar: UploadFile
+  countPosts: Int @computed(from: posts, alg: size)
+  posts(sort: String, limit: Int, start: Int, where: JSON): [Post!] @virtual
+  createdAt: DateTime! @computed(alg: DateTimeOnce) @format(value: "DD.MM.YYYY")
+  updatedAt: DateTime @computed(alg: DateTime) @format(value: "DD.MM.YYYY")
+}
+
+input UserInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  username: String!
+  email: String!
+  provider: String
+  confirmed: Boolean
+  blocked: Boolean
+  role: ID
+  avatar: ID
+  posts: [ID]
+}
+
+input editUserInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  username: String
+  email: String
+  provider: String
+  confirmed: Boolean
+  blocked: Boolean
+  role: ID
+  avatar: ID
+  posts: [ID]
+}
+
+extend type Query {
+  user(id: ID!): User
+  users(sort: String, limit: Int, start: Int, where: JSON): [User!]
+}
+
+extend type Mutation {
+  createUser(input: createUserInput): UserPayload
+  updateUser(input: updateUserInput): UserPayload
+}
+
+input createUserInput {
+  data: UserInput
+}
+
+input updateUserInput {
+  where: InputID
+  data: editUserInput
+}
+
+type UserPayload {
+  user: User
+  error: String
+}
+

@@ -1,0 +1,150 @@
+"""
+Example Post description
+"""
+type Post @entity(plural: "posts",
+indexes: [
+  [{title: asc}, {unique: true} ]
+  [{slug: asc}, {unique: true, sparse: true} ]
+  [{route: asc}, {unique: true, sparse: true} ]
+  [{route: hashed} ]
+  [{title: text, keywords: text, description: text, content: text}
+    { weights: {
+      title: 10,
+      keywords: 1,
+      content: 8,
+      description: 7
+    }}
+  ]
+  [{author: asc}]
+  [{tags: asc}]
+]){
+  _id: ID!
+  title: String! @required @trim
+  h1: String
+  slug: String! @computed(from: title, alg: slug)
+  route: String! @computed(from: slug, alg: route)
+  description: String @maxlength(value: 160)
+  keywords: String @maxlength(value: 255)
+  priority: Float @default(value: 0.5)
+  changefreq: ENUM_POST_CHANGEFREQ @default(value: monthly)
+  noindex: Boolean
+  state: ENUM_POST_STATE @default(value: draft)
+  contentLength: Int @computed(from: content, alg: length)
+  contentHash: String @computed(from: content, alg: hash)
+  content: String
+  notes: String
+  landing: Boolean
+  author: User
+  countTags: Int @computed(from: tags, alg: size)
+  tags(sort: String, limit: Int, start: Int, where: JSON): [Tag!]
+  countRedirects: Int @computed(from: redirects, alg: size)
+  redirects(sort: String, limit: Int, start: Int, where: JSON): [Redirect!] @virtual
+  template: Template
+  createdAt: DateTime! @computed(alg: DateTimeOnce) @format(value: "DD.MM.YYYY")
+  updatedAt: DateTime @computed(alg: DateTime) @format(value: "DD.MM.YYYY")
+# временные поля, только для тестов  
+  arrString: [String]
+  arrJSON: [JSON]
+  json: JSON
+  embedded: PostEmbedded @embedded
+}
+
+type PostEmbedded {
+  bool: Boolean
+  str: String
+  number: Int
+}
+
+input CreatePostEmbedded {
+  bool: Boolean
+  str: String
+  number: Int
+}
+
+input CreatePost {
+  title: String!
+  h1: String
+  slug: String
+  route: String
+  description: String
+  keywords: String
+  priority: Float = 0.5
+  changefreq: ENUM_POST_CHANGEFREQ = monthly
+  noindex: Boolean
+  state: ENUM_POST_STATE = draft
+  content: String
+  notes: String
+  landing: Boolean
+  author: ID
+  template: ID
+  tags: [ID]
+  redirects: [ID]
+  json: JSON
+  embedded: CreatePostEmbedded
+}
+
+input PostArrays {
+  tags: [ID]
+  redirects: [ID]
+  arrString: [String]
+  arrJSON: [JSON]
+}
+
+input UpdatePostData {
+  title: String
+  h1: String
+  slug: String
+  route: String
+  description: String
+  keywords: String
+  priority: Float
+  changefreq: ENUM_POST_CHANGEFREQ
+  noindex: Boolean
+  state: ENUM_POST_STATE
+  content: String
+  notes: String
+  landing: Boolean
+  author: ID
+  template: ID
+  json: JSON
+  embedded: CreatePostEmbedded
+}
+
+input UpdatePost {
+  where: InputID
+  set: UpdatePostData
+  unset: [String]
+  addToSet: PostArrays
+  push: PostArrays
+  pullAll: PostArrays
+}
+
+enum ENUM_POST_CHANGEFREQ {
+  always
+  hourly
+  daily
+  weekly
+  monthly
+  yearly
+  never
+}
+
+enum ENUM_POST_STATE {
+  draft
+  published
+}
+
+extend type Query {
+  post(id: ID!): Post
+  posts(sort: String, limit: Int, start: Int, where: JSON): [Post!]
+}
+
+extend type Mutation {
+  createPost(input: CreatePost): PostPayload
+  updatePost(input: UpdatePost): UpdateResult
+}
+
+type PostPayload {
+  post: Post
+  error: String
+}

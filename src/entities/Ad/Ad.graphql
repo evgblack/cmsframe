@@ -1,0 +1,65 @@
+"""
+Рекламные блоки
+"""
+type Ad @entity(plural: "ads",
+indexes: [
+  [{name: asc}, {unique: true} ]
+]){
+  _id: ID!
+  name: String! @required
+  content: String
+  tag: ENUM_AD_TAG
+  width: String
+  height: String
+  description: String
+  json: JSON
+}
+
+input AdInput {
+  name: String!
+  content: String
+  tag: ENUM_AD_TAG
+  width: String
+  height: String
+  description: String
+}
+
+input editAdInput {
+  name: String
+  content: String
+  tag: ENUM_AD_TAG
+  width: String
+  height: String
+  description: String
+}
+
+enum ENUM_AD_TAG {
+  yandex
+  adsense
+  luckyads
+}
+
+extend type Query {
+  ad(id: ID!): Ad
+  ads(sort: String, limit: Int, start: Int, where: JSON): [Ad!]
+}
+
+extend type Mutation {
+  createAd(input: createAdInput): AdPayload
+  updateAd(input: updateAdInput): AdPayload
+}
+
+input createAdInput {
+  data: AdInput
+}
+
+input updateAdInput {
+  where: InputID
+  data: editAdInput
+}
+
+type AdPayload {
+  ad: Ad
+  error: String
+}
+

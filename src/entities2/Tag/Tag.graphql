@@ -1,0 +1,42 @@
+"""
+Теги для постов
+"""
+type Tag @entity(plural: "tags") {
+  id: ID!
+  name: String! @unique @required
+  posts(sort: String, limit: Int, start: Int, where: JSON): [Post]
+}
+
+input TagInput {
+  name: String!
+  posts: [ID]
+}
+
+input editTagInput {
+  name: String
+  posts: [ID]
+}
+
+extend type Query {
+  tag(id: ID!): Tag
+  tags(sort: String, limit: Int, start: Int, where: JSON): [Tag]
+}
+
+extend type Mutation {
+  createTag(input: createTagInput): TagPayload
+  updateTag(input: updateTagInput): TagPayload
+}
+
+input createTagInput {
+  data: TagInput
+}
+
+input updateTagInput {
+  where: InputID
+  data: editTagInput
+}
+
+type TagPayload {
+  tag: Tag
+  error: String
+}

@@ -1,0 +1,52 @@
+"""
+Стили CSS
+"""
+type Style @entity(plural: "styles",
+indexes: [
+  [{name: asc}, {unique: true} ]
+]){
+  _id: ID!
+  name: String! @required
+  content: String
+  description: String
+  templates(sort: String, limit: Int, start: Int, where: JSON): [Template!] @virtual
+}
+
+input StyleInput {
+  name: String!
+  content: String
+  description: String
+  templates: [ID]
+}
+
+input editStyleInput {
+  name: String
+  content: String
+  description: String
+  templates: [ID]
+}
+
+extend type Query {
+  style(id: ID!): Style
+  styles(sort: String, limit: Int, start: Int, where: JSON): [Style!]
+}
+
+extend type Mutation {
+  createStyle(input: createStyleInput): StylePayload
+  updateStyle(input: updateStyleInput): StylePayload
+}
+
+input createStyleInput {
+  data: StyleInput
+}
+
+input updateStyleInput {
+  where: InputID
+  data: editStyleInput
+}
+
+type StylePayload {
+  style: Style
+  error: String
+}
+

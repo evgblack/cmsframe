@@ -1,0 +1,98 @@
+"""
+Example Post description
+"""
+type Post @entity(plural: "posts") {
+  id: ID!
+  createdAt: DateTime
+  updatedAt: DateTime
+  title: String! @unique @required
+  h1: String
+  slug: String @unique
+  route: String @unique
+  description: String
+  keywords: String
+  priority: Float
+  changefreq: ENUM_POST_CHANGEFREQ
+  noindex: Boolean
+  state: ENUM_POST_STATE
+  content: String @compute(length: true, hash: sha256)
+  contentLength: Int
+  notes: String
+  landing: Boolean
+  tags(sort: String, limit: Int, start: Int, where: JSON): [Tag]
+}
+
+input PostInput {
+  title: String!
+  h1: String
+  slug: String
+  route: String
+  description: String
+  keywords: String
+  priority: Float = 0.5
+  changefreq: ENUM_POST_CHANGEFREQ = monthly
+  noindex: Boolean
+  state: ENUM_POST_STATE = draft
+  content: String
+  notes: String
+  landing: Boolean = false
+  tags: [ID]
+}
+
+input editPostInput {
+  title: String
+  h1: String
+  slug: String
+  route: String
+  description: String
+  keywords: String
+  priority: Float
+  changefreq: ENUM_POST_CHANGEFREQ
+  noindex: Boolean
+  state: ENUM_POST_STATE
+  content: String
+  notes: String
+  landing: Boolean
+  tags: [ID]
+}
+
+
+
+enum ENUM_POST_CHANGEFREQ {
+  always
+  hourly
+  daily
+  weekly
+  monthly
+  yearly
+  never
+}
+
+enum ENUM_POST_STATE {
+  draft
+  published
+}
+
+extend type Query {
+  post(id: ID!): Post
+  posts(sort: String, limit: Int, start: Int, where: JSON): [Post]
+}
+
+extend type Mutation {
+  createPost(input: createPostInput): PostPayload
+  updatePost(input: updatePostInput): PostPayload
+}
+
+input createPostInput {
+  data: PostInput
+}
+
+input updatePostInput {
+  where: InputID
+  data: editPostInput
+}
+
+type PostPayload {
+  post: Post
+  error: String
+}

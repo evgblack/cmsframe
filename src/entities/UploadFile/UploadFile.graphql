@@ -1,0 +1,76 @@
+"""
+Для картинок
+"""
+type UploadFile @entity(plural: "uploadfiles",
+indexes: [
+  [{name: asc}, {unique: true} ]
+]){
+  _id: ID!
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String! @required
+  hash: String!
+  sha256: String
+  ext: String
+  mime: String! @required
+  size: String!
+  url: String!
+  provider: String!
+  public_id: String
+  related: [Morph!]
+}
+
+input UploadFileInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String!
+  hash: String!
+  sha256: String
+  ext: String
+  mime: String!
+  size: String!
+  url: String!
+  provider: String!
+  public_id: String
+  related: [ID]
+}
+
+input editUploadFileInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  hash: String
+  sha256: String
+  ext: String
+  mime: String
+  size: String
+  url: String
+  provider: String
+  public_id: String
+  related: [ID]
+}
+
+extend type Query {
+  uploadfile(id: ID!): UploadFile
+  uploadfiles(sort: String, limit: Int, start: Int, where: JSON): [UploadFile!]
+}
+
+extend type Mutation {
+  createUploadFile(input: createUploadFileInput): UploadFilePayload
+  updateUploadFile(input: updateUploadFileInput): UploadFilePayload
+}
+
+input createUploadFileInput {
+  data: UploadFileInput
+}
+
+input updateUploadFileInput {
+  where: InputID
+  data: editUploadFileInput
+}
+
+type UploadFilePayload {
+  uploadfile: UploadFile
+  error: String
+}
+

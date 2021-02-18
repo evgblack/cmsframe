@@ -1,0 +1,11 @@
+"""
+Редиректы
+"""
+type Redirect @entity(plural: "redirects",
+indexes: [
+  [{url: asc}, {unique: true} ]
+]){
+  _id: ID!
+  url: String! @required
+  post: Post
+}

@@ -1,0 +1,58 @@
+"""
+
+"""
+type Permission @entity(plural: "permissions") {
+  _id: ID!
+  type: String! @required
+  controller: String! @required
+  action: String! @required
+  enabled: Boolean!
+  policy: String
+  role: Role
+  description: String
+}
+
+input PermissionInput {
+  type: String!
+  controller: String!
+  action: String!
+  enabled: Boolean!
+  policy: String
+  role: ID
+  description: String
+}
+
+input editPermissionInput {
+  type: String
+  controller: String
+  action: String
+  enabled: Boolean
+  policy: String
+  role: ID
+  description: String
+}
+
+extend type Query {
+  permission(id: ID!): Permission
+  permissions(sort: String, limit: Int, start: Int, where: JSON): [Permission!]
+}
+
+extend type Mutation {
+  createPermission(input: createPermissionInput): PermissionPayload
+  updatePermission(input: updatePermissionInput): PermissionPayload
+}
+
+input createPermissionInput {
+  data: PermissionInput
+}
+
+input updatePermissionInput {
+  where: InputID
+  data: editPermissionInput
+}
+
+type PermissionPayload {
+  permission: Permission
+  error: String
+}
+

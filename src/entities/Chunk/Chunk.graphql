@@ -1,0 +1,56 @@
+"""
+Кусочки html из которых состоят шаблоны
+"""
+type Chunk @entity(plural: "chunks",
+indexes: [
+  [{name: asc}, {unique: true} ]
+]){
+  _id: ID!
+  name: String! @required
+  content: String
+  description: String
+  countChunks: Int @computed(from: chunks, alg: size)
+  chunks(sort: String, limit: Int, start: Int, where: JSON): [Chunk!]
+  templates(sort: String, limit: Int, start: Int, where: JSON): [Template!] @virtual
+}
+
+input ChunkInput {
+  name: String!
+  content: String
+  description: String
+  chunks: [ID]
+  templates: [ID]
+}
+
+input editChunkInput {
+  name: String
+  content: String
+  description: String
+  chunks: [ID]
+  templates: [ID]
+}
+
+extend type Query {
+  chunk(id: ID!): Chunk
+  chunks(sort: String, limit: Int, start: Int, where: JSON): [Chunk!]
+}
+
+extend type Mutation {
+  createChunk(input: createChunkInput): ChunkPayload
+  updateChunk(input: updateChunkInput): ChunkPayload
+}
+
+input createChunkInput {
+  data: ChunkInput
+}
+
+input updateChunkInput {
+  where: InputID
+  data: editChunkInput
+}
+
+type ChunkPayload {
+  chunk: Chunk
+  error: String
+}
+

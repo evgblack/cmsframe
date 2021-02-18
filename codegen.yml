@@ -1,0 +1,15 @@
+overwrite: true
+schema:
+  - schema.graphql:
+    loader: schema-loader.js
+require:
+  - ts-node/register
+documents: null
+generates:
+  src/generated/types.d.ts:
+    plugins:
+      - "typescript"
+
+  src/generated/mongodb.ts:
+    plugins:
+       - "typescript-mongodb"

@@ -1,0 +1,13 @@
+"""
+Рекламные блоки
+"""
+type Ad @entity(plural: "ads") {{
+  id: ID!
+  name: String @unique @required
+  content: String
+  tag: ENUM_AD_TAG
+  width: String
+  height: String
+  description: String
+  templates(sort: String, limit: Int, start: Int, where: JSON): [Template]
+}

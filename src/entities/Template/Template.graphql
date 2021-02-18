@@ -1,0 +1,65 @@
+"""
+Шаблоны для страниц
+"""
+type Template @entity(plural: "templates",
+indexes: [
+  [{name: asc}, {unique: true} ]
+]){
+  _id: ID!
+  name: String! @required
+  content: String
+  description: String
+  styles(sort: String, limit: Int, start: Int, where: JSON): [Style!]
+  scripts(sort: String, limit: Int, start: Int, where: JSON): [Script!]
+  ads(sort: String, limit: Int, start: Int, where: JSON): [Ad!]
+  chunks(sort: String, limit: Int, start: Int, where: JSON): [Chunk!]
+  countPosts: Int @computed(from: posts, alg: size)
+  posts(sort: String, limit: Int, start: Int, where: JSON): [Post!] @virtual
+}
+
+input TemplateInput {
+  name: String!
+  content: String
+  description: String
+  styles: [ID]
+  scripts: [ID]
+  ads: [ID]
+  chunks: [ID]
+  posts: [ID]
+}
+
+input editTemplateInput {
+  name: String
+  content: String
+  description: String
+  styles: [ID]
+  scripts: [ID]
+  ads: [ID]
+  chunks: [ID]
+  posts: [ID]
+}
+
+extend type Query {
+  template(id: ID!): Template
+  templates(sort: String, limit: Int, start: Int, where: JSON): [Template!]
+}
+
+extend type Mutation {
+  createTemplate(input: createTemplateInput): TemplatePayload
+  updateTemplate(input: updateTemplateInput): TemplatePayload
+}
+
+input createTemplateInput {
+  data: TemplateInput
+}
+
+input updateTemplateInput {
+  where: InputID
+  data: editTemplateInput
+}
+
+type TemplatePayload {
+  template: Template
+  error: String
+}
+
